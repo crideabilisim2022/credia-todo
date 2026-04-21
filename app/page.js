@@ -16,9 +16,11 @@ const [confirm, setConfirm] = useState({
   assignedTo: null,
 });
   const router = useRouter();
-
-  const isAdmin =
-    user?.email === "berat.dimen@cridea.com.tr";
+const adminList = [
+  "berat.dimen@cridea.com.tr",
+  "safa.dalgicoglu@cridea.com.tr",
+];
+  const isAdmin = adminList.includes(user?.email);
 
   // USER CHECK
   useEffect(() => {
