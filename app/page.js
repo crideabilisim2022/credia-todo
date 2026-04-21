@@ -16,11 +16,15 @@ const [confirm, setConfirm] = useState({
   assignedTo: null,
 });
   const router = useRouter();
+  
 const adminList = [
   "berat.dimen@cridea.com.tr",
   "safa.dalgicoglu@cridea.com.tr",
 ];
-  const isAdmin = adminList.includes(user?.email);
+
+const isAdmin =
+  !!user &&
+  adminList.includes(user.email?.toLowerCase());
 
   // USER CHECK
   useEffect(() => {
@@ -66,37 +70,41 @@ const adminList = [
   }, [user]);
 
   // ADD
-  const addTodo = async () => {
-    if (!text || !user) return;
+const addTodo = async () => {
+  if (!text || !user) return;
 
-    await supabase.from("todos").insert([
-      {
-        text,
-        status: "todo",
-        user_id: user.id,
-        user_email: user.email,
-        assigned_to: isAdmin ? assignedTo : user.email,
-      },
-    ]);
-if (error) {
-  toast.error("Görev eklenemedi");
-} else {
+  const { error } = await supabase.from("todos").insert([
+    {
+      text,
+      status: "todo",
+      user_id: user.id,
+      user_email: user.email,
+      assigned_to: isAdmin ? assignedTo : user.email,
+    },
+  ]);
+
+  if (error) {
+    toast.error("Görev eklenemedi");
+    return;
+  }
+
   toast.success("Görev eklendi");
-}
-    setText("");
-    setAssignedTo("");
-  };
+  setText("");
+  setAssignedTo("");
+};
 
   // UPDATE
 const updateStatus = (id, status, assignedTo) => {
   const currentEmail = user?.email?.toLowerCase();
   const taskOwner = assignedTo?.toLowerCase();
 
+  // 🔐 PERMISSION CHECK
   if (taskOwner !== currentEmail && !isAdmin) {
     toast.error("Sadece sana atanan taski değiştirebilirsin");
     return;
   }
 
+  // 🚀 MODAL AÇ
   setConfirm({
     open: true,
     id,
@@ -141,7 +149,8 @@ const updateStatus = (id, status, assignedTo) => {
       </span>
     );
   };
-
+console.log("USER EMAIL:", user?.email);
+console.log("IS ADMIN:", isAdmin);
   return (
     <div className="min-h-screen bg-gray-100 flex">
 
@@ -155,18 +164,7 @@ const updateStatus = (id, status, assignedTo) => {
           {user.email}
         </div>
 
-        {isAdmin && (
-          <select
-            value={assignedTo}
-            onChange={(e) => setAssignedTo(e.target.value)}
-            className="w-full p-2 text-black rounded"
-          >
-            <option value="">Kullanıcı seç</option>
-            <option value="berat.dimen@cridea.com.tr">BERAT</option>
-            <option value="sehmus@cridea.com.tr">ŞEHMUS</option>
-            <option value="deniz@cridea.com.tr">DENİZ</option>
-          </select>
-        )}
+       
 
         <button
           onClick={async () => {
@@ -188,7 +186,48 @@ const updateStatus = (id, status, assignedTo) => {
             Ofis Task Board
           </h2>
         </div>
+{user && isAdmin && (
+  <div className="mb-4">
+    <label className="text-xs text-gray-400 mb-1 block">
+      Görev Atama
+    </label>
 
+    <select
+      value={assignedTo}
+      onChange={(e) => setAssignedTo(e.target.value)}
+      className="
+        w-full 
+        p-2 
+        rounded-lg 
+        bg-gray-900 
+        text-white 
+        border 
+        border-gray-700 
+        outline-none 
+        cursor-pointer
+        hover:border-gray-500
+        focus:border-blue-500
+        transition
+      "
+    >
+      <option value="" className="text-gray-400">
+        Kullanıcı seç
+      </option>
+      <option value="berat.dimen@cridea.com.tr">
+        BERAT
+      </option>
+      <option value="sehmus@cridea.com.tr">
+        ŞEHMUS
+      </option>
+      <option value="deniz@cridea.com.tr">
+        DENİZ
+      </option>
+      <option value="safa.dalgicoglu@cridea.com.tr">
+        SAFA
+      </option>
+    </select>
+  </div>
+)}
         {/* ADD */}
         <div className="flex gap-2 mb-6">
           <input
@@ -317,7 +356,12 @@ const updateStatus = (id, status, assignedTo) => {
 
             toast.success("Durum güncellendi");
 
-            setConfirm({ open: false });
+            setConfirm({
+    open: false,
+    id: null,
+    status: null,
+    assignedTo: null,
+  });
           }}
           className="px-3 py-1 bg-black text-white rounded"
         >
