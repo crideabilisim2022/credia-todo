@@ -55,7 +55,7 @@ export default function LoginPage() {
       >
 
         <h1 className="text-2xl font-bold text-white text-center mb-6">
-          Cridea Task System
+          Credia Task System
         </h1>
 
         <p className="text-gray-300 text-center text-sm mb-6">
@@ -93,7 +93,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          © Cridea Bilişim - Task Management System
+          © Credia Bilişim - Task Management System
         </p>
 
       </motion.div>

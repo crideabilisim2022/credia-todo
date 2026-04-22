@@ -181,7 +181,7 @@ export default function Home() {
     {/* LOGO / BRAND */}
     <div className="mb-8">
       <h1 className="text-xl font-bold tracking-wide">
-        CRIDEA SYSTEMS
+        CREDIA SYSTEMS
       </h1>
       <p className="text-xs text-blue-300">
         Bilişim & Yazılım Çözümleri
@@ -252,7 +252,7 @@ export default function Home() {
 </button>
 
     <p className="text-[10px] text-blue-400 mt-3 text-center">
-      Cridea Task System v1.0
+      Credia Task System v1.0
     </p>
 
   </div>
