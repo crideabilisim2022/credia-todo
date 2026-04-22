@@ -51,14 +51,20 @@ export default function Home() {
     getUser();
   }, []);
 
-  const fetchTodos = async () => {
-    const { data } = await supabase
-      .from("todos")
-      .select("*")
-      .order("created_at", { ascending: false });
+ const fetchTodos = async () => {
+  const { data, error } = await supabase
+    .from("todos")
+    .select("*")
+    .eq("archived", false) // 👈 sadece aktifler
+    .order("created_at", { ascending: false });
 
-    if (data) setTodos(data);
-  };
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  if (data) setTodos(data);
+};
 
   useEffect(() => {
     if (!user) return;
@@ -129,12 +135,21 @@ export default function Home() {
   };
 
   // DELETE
-  const deleteTodo = async (id) => {
-    if (!isAdmin) return toast.error("Sadece admin silebilir");
+const deleteTodo = async (id) => {
+  if (!isAdmin) return toast.error("Sadece admin silebilir");
 
-    await supabase.from("todos").delete().eq("id", id);
-    toast.success("Görev silindi");
-  };
+  const { error } = await supabase
+    .from("todos")
+    .update({ archived: true })
+    .eq("id", id);
+
+  if (error) {
+    toast.error("Arşive taşınamadı");
+    return;
+  }
+
+  toast.success("Görev arşive taşındı");
+};
 
   if (!user)
     return (
@@ -143,26 +158,40 @@ export default function Home() {
       </div>
     );
 
-  const columns = {
-    todo: todos.filter((t) => t.status === "todo"),
-    doing: todos.filter((t) => t.status === "doing"),
-    done: todos.filter((t) => t.status === "done"),
+const columns = {
+  "Görev": todos.filter((t) => t.status === "todo"),
+  "Yapılıyor": todos.filter((t) => t.status === "doing"),
+  "Yapıldı": todos.filter((t) => {
+    if (t.status !== "done") return false;
+
+    const doneDate = new Date(t.completed_at);
+    const now = new Date();
+
+    const diffDays = (now - doneDate) / (1000 * 60 * 60 * 24);
+
+    return diffDays < 7;
+  }),
+};
+const StatusBadge = ({ status }) => {
+  const map = {
+    todo: "Görev",
+    doing: "Yapılıyor",
+    done: "Yapıldı",
   };
 
-  const StatusBadge = ({ status }) => {
-    const color =
-      status === "todo"
-        ? "bg-blue-100 text-blue-700"
-        : status === "doing"
-        ? "bg-indigo-100 text-indigo-700"
-        : "bg-green-100 text-green-700";
+  const color =
+    status === "todo"
+      ? "bg-blue-100 text-blue-700"
+      : status === "doing"
+      ? "bg-yellow-100 text-yellow-700"
+      : "bg-green-100 text-green-700";
 
-    return (
-      <span className="px-2 py-1 text-xs rounded-full font-semibold">
-        {status.toUpperCase()}
-      </span>
-    );
-  };
+  return (
+    <span className={`px-2 py-1 text-xs rounded-full font-semibold ${color}`}>
+      {map[status]}
+    </span>
+  );
+};
   const fixDate = (date) => {
   const d = new Date(date);
   d.setHours(d.getHours() + 3);
@@ -172,98 +201,13 @@ export default function Home() {
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-blue-50 to-white">
 
-      {/* SIDEBAR */}
-<div className="w-72 h-screen sticky top-0 bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950 text-white flex flex-col justify-between border-r border-blue-800">
-
-  {/* TOP */}
-  <div className="p-5">
-
-    {/* LOGO / BRAND */}
-    <div className="mb-8">
-      <h1 className="text-xl font-bold tracking-wide">
-        CREDIA SYSTEMS
-      </h1>
-      <p className="text-xs text-blue-300">
-        Bilişim & Yazılım Çözümleri
-      </p>
-    </div>
-
-    {/* USER CARD */}
-    <div className="bg-blue-900/40 border border-blue-700 rounded-xl p-4 mb-6">
-      <p className="text-sm font-semibold break-all">
-        {user.email}
-      </p>
-
-      <div className="flex items-center justify-between mt-2">
-        <span className="text-xs text-blue-300">
-          {isAdmin ? "Admin User" : "Standard User"}
-        </span>
-
-        <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-          isAdmin
-            ? "bg-green-500/20 text-green-300"
-            : "bg-gray-500/20 text-gray-300"
-        }`}>
-          {isAdmin ? "ADMIN" : "USER"}
-        </span>
-      </div>
-    </div>
-
-    {/* MENU */}
-    <div className="space-y-2">
-
-      <div className="text-xs text-blue-400 uppercase mb-2">
-        Menü
-      </div>
-
-      <div className="p-3 rounded-xl bg-blue-800/40 hover:bg-blue-700 transition cursor-pointer">
-        📋 Tasks
-      </div>
-
-      <div className="p-3 rounded-xl hover:bg-blue-800/40 transition cursor-pointer">
-        📊 Dashboard
-      </div>
-
-      {isAdmin && (
-        <div className="p-3 rounded-xl hover:bg-blue-800/40 transition cursor-pointer">
-          👥 Users
-        </div>
-      )}
-
-      <div className="p-3 rounded-xl hover:bg-blue-800/40 transition cursor-pointer">
-        ⚙️ Settings
-      </div>
-
-    </div>
-
-  </div>
-
-  {/* BOTTOM */}
-  <div className="p-5 border-t border-blue-800">
-
-  <button
-  onClick={async () => {
-    await supabase.auth.signOut();
-    router.push("/login");
-  }}
-  className="w-full bg-red-500 hover:bg-red-600 transition py-2 rounded-lg text-sm font-medium shadow-md"
->
-  🚪 Çıkış Yap
-</button>
-
-    <p className="text-[10px] text-blue-400 mt-3 text-center">
-      Credia Task System v1.0
-    </p>
-
-  </div>
-
-</div>
+  
 
       {/* MAIN */}
       <div className="flex-1 p-8">
 
         <h2 className="text-2xl font-bold text-blue-900 mb-6">
-          Ofis Task Board
+          Ofis Görev Takip Sistemi
         </h2>
 
         {/* ADD */}
@@ -363,7 +307,7 @@ export default function Home() {
                         }
                         className="text-xs bg-gray-200 px-2 py-1 rounded"
                       >
-                        Todo
+                        Görev
                       </button>
 
                       <button
@@ -372,7 +316,7 @@ export default function Home() {
                         }
                         className="text-xs bg-yellow-200 px-2 py-1 rounded"
                       >
-                        Doing
+                        Yapılıyor
                       </button>
 
                       <button
@@ -381,7 +325,7 @@ export default function Home() {
                         }
                         className="text-xs bg-green-200 px-2 py-1 rounded"
                       >
-                        Done
+                        Yapıldı
                       </button>
 
                       <button
