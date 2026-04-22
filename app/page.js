@@ -332,7 +332,7 @@ const StatusBadge = ({ status }) => {
                         onClick={() => deleteTodo(item.id)}
                         className="text-xs bg-red-200 px-2 py-1 rounded"
                       >
-                        Sil
+                        Arşive Taşı
                       </button>
 
                     </div>
