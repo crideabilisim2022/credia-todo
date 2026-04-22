@@ -1,21 +1,19 @@
-"use client";
-
-import { usePathname } from "next/navigation";
 import SidebarWrapper from "@/components/sidebarWrapper/inedx";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 
+export const metadata = {
+  title: "Credia Task System",
+  description: "Task yönetim sistemi",
+  manifest: "/manifest.json",
+};
+
 export default function RootLayout({ children }) {
-  const pathname = usePathname();
-
-  // login sayfasında sidebar gösterme
-  const hideSidebar = pathname === "/login";
-
   return (
-    <html lang="en">
+    <html lang="tr">
       <body className="min-h-screen flex">
 
-        {!hideSidebar && <SidebarWrapper />}
+        <SidebarWrapper />
 
         <main className="flex-1">
           {children}
