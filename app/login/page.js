@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -10,6 +10,19 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // 🔥 GİRİŞ YAPMIŞ KULLANICIYI ANA SAYFAYA AT
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getUser();
+
+      if (data?.user) {
+        router.replace("/");
+      }
+    };
+
+    checkUser();
+  }, [router]);
 
   const login = async () => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -34,7 +47,6 @@ export default function LoginPage() {
   return (
     <div className="h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800">
 
-      {/* CARD */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -42,21 +54,14 @@ export default function LoginPage() {
         className="w-[380px] bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl"
       >
 
-        {/* HEADER */}
-        <motion.h1
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-2xl font-bold text-white text-center mb-6"
-        >
+        <h1 className="text-2xl font-bold text-white text-center mb-6">
           Cridea Task System
-        </motion.h1>
+        </h1>
 
         <p className="text-gray-300 text-center text-sm mb-6">
           Kurumsal görev yönetim paneli
         </p>
 
-        {/* INPUTS */}
         <div className="space-y-3">
 
           <input
@@ -74,7 +79,6 @@ export default function LoginPage() {
 
         </div>
 
-        {/* BUTTONS */}
         <div className="mt-6 space-y-3">
 
           <motion.button
@@ -86,18 +90,8 @@ export default function LoginPage() {
             Giriş Yap
           </motion.button>
 
-          {/* <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={register}
-            className="w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-lg transition"
-          >
-            Kayıt Ol
-          </motion.button> */}
-
         </div>
 
-        {/* FOOTER */}
         <p className="text-center text-xs text-gray-400 mt-6">
           © Cridea Bilişim - Task Management System
         </p>
