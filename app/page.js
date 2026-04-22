@@ -131,6 +131,7 @@ export default function Home() {
       id,
       status,
       assignedTo,
+      performedBy: "",
     });
   };
 
@@ -279,7 +280,11 @@ const StatusBadge = ({ status }) => {
                     <p className="text-xs text-gray-400">
                       Oluşturan: {item.user_email}
                     </p>
-
+{item.performed_by && (
+  <p className="text-xs text-purple-600 mt-1">
+    👷 Yapan: {userMap[item.performed_by] || item.performed_by}
+  </p>
+)}
                     {/* TARİHLER */}
                 {item.created_at && (
   <p className="text-[10px] text-blue-500 mt-2">
@@ -359,7 +364,22 @@ const StatusBadge = ({ status }) => {
             <p className="text-sm text-gray-600 mb-4">
               {confirm.status} olarak güncellenecek
             </p>
-
+<select
+  value={confirm.performedBy || ""}
+  onChange={(e) =>
+    setConfirm((prev) => ({
+      ...prev,
+      performedBy: e.target.value,
+    }))
+  }
+  className="w-full p-2 border rounded mb-3 text-sm"
+>
+  <option value="">Yapan kişiyi seç</option>
+  <option value="berat.dimen@cridea.com.tr">BERAT</option>
+  <option value="sehmus@cridea.com.tr">ŞEHMUS</option>
+  <option value="deniz@cridea.com.tr">DENİZ</option>
+  <option value="safa.dalgicoglu@cridea.com.tr">SAFA</option>
+</select>
             <div className="flex gap-2 justify-end">
 
               <button
@@ -371,39 +391,54 @@ const StatusBadge = ({ status }) => {
                 İptal
               </button>
 
-              <button
-                onClick={async () => {
-                  const now = new Date().toISOString();
+ <button
+  onClick={async () => {
+    const now = new Date().toISOString();
 
-                  let updateData = { status: confirm.status };
+    let updateData = {
+      status: confirm.status,
+    };
 
-                  if (confirm.status === "doing") {
-                    updateData.started_at = now;
-                  }
+    if (confirm.status === "doing") {
+      updateData.started_at = now;
+    }
 
-                  if (confirm.status === "done") {
-                    updateData.completed_at = now;
-                  }
+    if (confirm.status === "done") {
+      updateData.completed_at = now;
 
-                  await supabase
-                    .from("todos")
-                    .update(updateData)
-                    .eq("id", confirm.id);
+      // 👇 ARTIK OTOMATİK DEĞİL
+      if (!confirm.performedBy) {
+        toast.error("Yapan kişi seçilmedi");
+        return;
+      }
 
-                  toast.success("Durum güncellendi");
+      updateData.performed_by = confirm.performedBy;
+    }
 
-                  setConfirm({
-                    open: false,
-                    id: null,
-                    status: null,
-                    assignedTo: null,
-                  });
-                }}
-                className="px-3 py-1 bg-blue-600 text-white rounded"
-              >
-                Onayla
-              </button>
+    const { error } = await supabase
+      .from("todos")
+      .update(updateData)
+      .eq("id", confirm.id);
 
+    if (error) {
+      toast.error("Güncellenemedi");
+      return;
+    }
+
+    toast.success("Durum güncellendi");
+
+    setConfirm({
+      open: false,
+      id: null,
+      status: null,
+      assignedTo: null,
+      performedBy: "",
+    });
+  }}
+  className="px-3 py-1 bg-blue-600 text-white rounded"
+>
+  Onayla
+</button>
             </div>
 
           </div>
