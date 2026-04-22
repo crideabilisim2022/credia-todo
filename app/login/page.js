@@ -93,7 +93,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          © Credia Bilişim - Task Management System
+          © Credia Bilişim - Görev Yönetim Sistemi
         </p>
 
       </motion.div>
