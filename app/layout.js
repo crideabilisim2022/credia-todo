@@ -1,4 +1,4 @@
-import SidebarWrapper from "@/components/sidebarWrapper/inedx";
+import SidebarWrapper from "@/components/sidebarWrapper";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 
