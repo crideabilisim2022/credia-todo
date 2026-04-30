@@ -1,12 +1,32 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Sidebar({ user, isAdmin }) {
-  const router = useRouter();
+  const pathname = usePathname();
 
   if (!user) return null;
+
+  const menuItem = (href, label, icon) => {
+    const active = pathname === href;
+
+    return (
+      <Link
+        href={href}
+        className={`p-3 rounded-xl flex items-center gap-2 transition
+        ${
+          active
+            ? "bg-blue-700 text-white"
+            : "hover:bg-blue-800/40 text-blue-100"
+        }`}
+      >
+        <span>{icon}</span>
+        <span>{label}</span>
+      </Link>
+    );
+  };
 
   return (
     <div className="w-72 h-screen sticky top-0 bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950 text-white flex flex-col justify-between border-r border-blue-800">
@@ -14,7 +34,7 @@ export default function Sidebar({ user, isAdmin }) {
       {/* TOP */}
       <div className="p-5">
 
-        {/* LOGO / BRAND */}
+        {/* LOGO */}
         <div className="mb-8">
           <h1 className="text-xl font-bold tracking-wide">
             CREDIA SYSTEMS
@@ -24,25 +44,21 @@ export default function Sidebar({ user, isAdmin }) {
           </p>
         </div>
 
-        {/* USER CARD */}
+        {/* USER */}
         <div className="bg-blue-900/40 border border-blue-700 rounded-xl p-4 mb-6">
           <p className="text-sm font-semibold break-all">
             {user.email}
           </p>
 
-          <div className="flex items-center justify-between mt-2">
-            {/* <span className="text-xs text-blue-300">
-              {isAdmin ? "Admin" : "Kullanıcı"}
-            </span> */}
-
-            <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+          <span
+            className={`text-[10px] px-2 py-0.5 rounded-full mt-2 inline-block ${
               isAdmin
                 ? "bg-green-500/20 text-green-300"
                 : "bg-gray-500/20 text-gray-300"
-            }`}>
-              {isAdmin ? "ADMIN" : "KULLANICI"}
-            </span>
-          </div>
+            }`}
+          >
+            {isAdmin ? "ADMIN" : "KULLANICI"}
+          </span>
         </div>
 
         {/* MENU */}
@@ -52,36 +68,19 @@ export default function Sidebar({ user, isAdmin }) {
             Menü
           </div>
 
-          <div
-            onClick={() => router.push("/")}
-            className="p-3 rounded-xl bg-blue-800/40 hover:bg-blue-700 transition cursor-pointer"
-          >
-            📋 Görevler
-          </div>
+          {menuItem("/", "Görevler", "📋")}
 
-          <div className="p-3 rounded-xl hover:bg-blue-800/40 transition cursor-pointer">
-            📊 Kontrol Paneli
-          </div>
+          {menuItem("/dashboard", "Kontrol Paneli", "📊")}
 
-          <div
-            onClick={() => router.push("/archive")}
-            className="p-3 rounded-xl hover:bg-blue-800/40 transition cursor-pointer"
-          >
-            📦 Arşiv
-          </div>
+          {menuItem("/archive", "Arşiv", "📦")}
 
-          {isAdmin && (
-            <div className="p-3 rounded-xl hover:bg-blue-800/40 transition cursor-pointer">
-              👥 Kullanıcılar
-            </div>
-          )}
+          {menuItem("/companies", "Firmalar", "🏢")}
 
-          <div className="p-3 rounded-xl hover:bg-blue-800/40 transition cursor-pointer">
-            ⚙️ Ayarlar
-          </div>
+          {isAdmin && menuItem("/users", "Kullanıcılar", "👥")}
+
+          {menuItem("/settings", "Ayarlar", "⚙️")}
 
         </div>
-
       </div>
 
       {/* BOTTOM */}
@@ -90,7 +89,7 @@ export default function Sidebar({ user, isAdmin }) {
         <button
           onClick={async () => {
             await supabase.auth.signOut();
-            router.push("/login");
+            window.location.href = "/login";
           }}
           className="w-full bg-red-500 hover:bg-red-600 transition py-2 rounded-lg text-sm font-medium shadow-md"
         >
@@ -98,7 +97,7 @@ export default function Sidebar({ user, isAdmin }) {
         </button>
 
         <p className="text-[10px] text-blue-400 mt-3 text-center">
-          Credia Görev Sistemi v1.0
+          Credia Görev Sistemi v1.2
         </p>
 
       </div>

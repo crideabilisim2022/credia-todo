@@ -137,7 +137,7 @@ export default function Home() {
 
   // DELETE
 const deleteTodo = async (id) => {
-  if (!isAdmin) return toast.error("Sadece admin silebilir");
+  if (!isAdmin) return toast.error("Sadece admin Arşive taşıyabilir");
 
   const { error } = await supabase
     .from("todos")
