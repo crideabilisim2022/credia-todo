@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function Sidebar({ user, isAdmin }) {
+export default function Sidebar({ user, isAdmin, onClose }) {
   const pathname = usePathname();
 
   if (!user) return null;
@@ -15,6 +15,7 @@ export default function Sidebar({ user, isAdmin }) {
     return (
       <Link
         href={href}
+        onClick={onClose} // 👈 mobile kapanma
         className={`p-3 rounded-xl flex items-center gap-2 transition
         ${
           active
@@ -29,10 +30,19 @@ export default function Sidebar({ user, isAdmin }) {
   };
 
   return (
-    <div className="w-72 h-screen sticky top-0 bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950 text-white flex flex-col justify-between border-r border-blue-800">
+    <div
+      className="
+        w-72 h-full md:h-screen md:sticky md:top-0
+        bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950
+        text-white flex flex-col justify-between
+        border-r border-blue-800
+      "
+    >
 
       {/* TOP */}
       <div className="p-5">
+
+      
 
         {/* LOGO */}
         <div className="mb-8">
@@ -69,17 +79,13 @@ export default function Sidebar({ user, isAdmin }) {
           </div>
 
           {menuItem("/", "Görevler", "📋")}
-
           {menuItem("/dashboard", "Kontrol Paneli", "📊")}
-
           {menuItem("/archive", "Arşiv", "📦")}
-
           {menuItem("/companies", "Firmalar", "🏢")}
 
           {isAdmin && menuItem("/users", "Kullanıcılar", "👥")}
 
           {menuItem("/settings", "Ayarlar", "⚙️")}
-
         </div>
       </div>
 

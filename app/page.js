@@ -199,251 +199,250 @@ const StatusBadge = ({ status }) => {
   return d.toLocaleString("tr-TR");
 };
 
-  return (
-    <div className="min-h-screen flex bg-gradient-to-br from-blue-50 to-white">
+return (
+  <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-blue-50 to-white">
 
-  
+    {/* MAIN */}
+    <div className="flex-1 p-4 md:p-8 w-full">
 
-      {/* MAIN */}
-      <div className="flex-1 p-8">
+      <h2 className="text-xl md:text-2xl font-bold text-blue-900 mb-6">
+        Ofis Görev Takip Sistemi
+      </h2>
 
-        <h2 className="text-2xl font-bold text-blue-900 mb-6">
-          Ofis Görev Takip Sistemi
-        </h2>
+      {/* ADD */}
+      <div className="flex flex-col md:flex-row gap-2 mb-6">
 
-        {/* ADD */}
-{/* ADD */}
-<div className="flex flex-col md:flex-row gap-2 mb-6">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="flex-1 p-3 rounded border border-blue-200 focus:outline-blue-500 text-sm md:text-base"
+          placeholder="Görev yaz..."
+        />
 
-  {/* INPUT */}
-  <input
-    value={text}
-    onChange={(e) => setText(e.target.value)}
-    className="flex-1 p-3 rounded border border-blue-200 focus:outline-blue-500"
-    placeholder="Görev yaz..."
-  />
+        {isAdmin && (
+          <select
+            value={assignedTo}
+            onChange={(e) => setAssignedTo(e.target.value)}
+            className="p-3 rounded border border-blue-200 bg-white text-sm focus:outline-blue-500"
+          >
+            <option value="">Kişi seç</option>
+            <option value="berat.dimen@cridea.com.tr">BERAT</option>
+            <option value="sehmus@cridea.com.tr">ŞEHMUS</option>
+            <option value="deniz@cridea.com.tr">DENİZ</option>
+            <option value="safa.dalgicoglu@cridea.com.tr">SAFA</option>
+          </select>
+        )}
 
-  {/* ADMIN İSE GÖSTER */}
-  {isAdmin && (
-    <select
-      value={assignedTo}
-      onChange={(e) => setAssignedTo(e.target.value)}
-      className="p-3 rounded border border-blue-200 bg-white text-sm focus:outline-blue-500"
-    >
-      <option value="">Kişi seç</option>
-      <option value="berat.dimen@cridea.com.tr">BERAT</option>
-      <option value="sehmus@cridea.com.tr">ŞEHMUS</option>
-      <option value="deniz@cridea.com.tr">DENİZ</option>
-      <option value="safa.dalgicoglu@cridea.com.tr">SAFA</option>
-    </select>
-  )}
+        <button
+          onClick={addTodo}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded text-sm md:text-base"
+        >
+          Ekle
+        </button>
+      </div>
 
-  {/* BUTTON */}
-  <button
-    onClick={addTodo}
-    className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded"
-  >
-    Ekle
-  </button>
+      {/* BOARD */}
+      <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch md:items-start overflow-x-auto">
 
-</div>
-        {/* BOARD */}
-        <div className="flex gap-6 items-start overflow-x-auto">
+        {Object.entries(columns).map(([key, items]) => (
+          <div
+            key={key}
+            className="w-full md:min-w-[300px] bg-white rounded-xl p-4 shadow-md border border-blue-100"
+          >
+            <h3 className="font-bold mb-4 text-center text-blue-800 capitalize">
+              {key}
+            </h3>
 
-          {Object.entries(columns).map(([key, items]) => (
-            <div
-              key={key}
-              className="min-w-[300px] bg-white rounded-xl p-4 shadow-md border border-blue-100"
-            >
-              <h3 className="font-bold mb-4 text-center text-blue-800 capitalize">
-                {key}
-              </h3>
+            <div className="space-y-3">
 
-              <div className="space-y-3">
+              {items.map((item) => (
+                <div
+                  key={item.id}
+                  className="border border-blue-100 rounded-lg p-3 bg-blue-50"
+                >
 
-                {items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="border border-blue-100 rounded-lg p-3 bg-blue-50"
-                  >
+                  <StatusBadge status={item.status} />
 
-                    <StatusBadge status={item.status} />
+                  <p className="font-medium mt-2 text-blue-900 text-sm md:text-base">
+                    {item.text}
+                  </p>
 
-                    <p className="font-medium mt-2 text-blue-900">
-                      {item.text}
+                  <p className="text-xs text-gray-600 mt-1">
+                    Atanan: {userMap[item.assigned_to] || item.assigned_to || "Atanmamış"}
+                  </p>
+
+                  <p className="text-xs text-gray-400">
+                    Oluşturan: {item.user_email}
+                  </p>
+
+                  {item.performed_by && (
+                    <p className="text-xs text-purple-600 mt-1">
+                      👷 Yapan: {userMap[item.performed_by] || item.performed_by}
                     </p>
+                  )}
 
-                    <p className="text-xs text-gray-600 mt-1">
-                      Atanan: {userMap[item.assigned_to] || item.assigned_to || "Atanmamış"}
+                  {/* TARİHLER */}
+                  {item.created_at && (
+                    <p className="text-[10px] text-blue-500 mt-2">
+                      Oluşturulma: {fixDate(item.created_at)}
                     </p>
+                  )}
 
-                    <p className="text-xs text-gray-400">
-                      Oluşturan: {item.user_email}
+                  {item.started_at && (
+                    <p className="text-[10px] text-yellow-600">
+                      Başlama: {fixDate(item.started_at)}
                     </p>
-{item.performed_by && (
-  <p className="text-xs text-purple-600 mt-1">
-    👷 Yapan: {userMap[item.performed_by] || item.performed_by}
-  </p>
-)}
-                    {/* TARİHLER */}
-                {item.created_at && (
-  <p className="text-[10px] text-blue-500 mt-2">
-    Oluşturulma: {fixDate(item.created_at)}
-  </p>
-)}
+                  )}
 
-{item.started_at && (
-  <p className="text-[10px] text-yellow-600">
-    Başlama: {fixDate(item.started_at)}
-  </p>
-)}
+                  {item.completed_at && (
+                    <p className="text-[10px] text-green-600">
+                      Bitiş: {fixDate(item.completed_at)}
+                    </p>
+                  )}
 
-{item.completed_at && (
-  <p className="text-[10px] text-green-600">
-    Bitiş: {fixDate(item.completed_at)}
-  </p>
-)}
-                    {/* ACTIONS */}
-                    <div className="flex gap-2 mt-3 flex-wrap">
+                  {/* ACTIONS */}
+                  <div className="flex flex-wrap gap-2 mt-3">
 
-                      <button
-                        onClick={() =>
-                          updateStatus(item.id, "todo", item.assigned_to)
-                        }
-                        className="text-xs bg-gray-200 px-2 py-1 rounded"
-                      >
-                        Görev
-                      </button>
+                    <button
+                      onClick={() =>
+                        updateStatus(item.id, "todo", item.assigned_to)
+                      }
+                      className="text-xs bg-gray-200 px-2 py-1 rounded"
+                    >
+                      Görev
+                    </button>
 
-                      <button
-                        onClick={() =>
-                          updateStatus(item.id, "doing", item.assigned_to)
-                        }
-                        className="text-xs bg-yellow-200 px-2 py-1 rounded"
-                      >
-                        Yapılıyor
-                      </button>
+                    <button
+                      onClick={() =>
+                        updateStatus(item.id, "doing", item.assigned_to)
+                      }
+                      className="text-xs bg-yellow-200 px-2 py-1 rounded"
+                    >
+                      Yapılıyor
+                    </button>
 
-                      <button
-                        onClick={() =>
-                          updateStatus(item.id, "done", item.assigned_to)
-                        }
-                        className="text-xs bg-green-200 px-2 py-1 rounded"
-                      >
-                        Yapıldı
-                      </button>
+                    <button
+                      onClick={() =>
+                        updateStatus(item.id, "done", item.assigned_to)
+                      }
+                      className="text-xs bg-green-200 px-2 py-1 rounded"
+                    >
+                      Yapıldı
+                    </button>
 
-                      <button
-                        onClick={() => deleteTodo(item.id)}
-                        className="text-xs bg-red-200 px-2 py-1 rounded"
-                      >
-                        Arşive Taşı
-                      </button>
-
-                    </div>
+                    <button
+                      onClick={() => deleteTodo(item.id)}
+                      className="text-xs bg-red-200 px-2 py-1 rounded"
+                    >
+                      Arşive Taşı
+                    </button>
 
                   </div>
-                ))}
 
-              </div>
+                </div>
+              ))}
+
             </div>
-          ))}
+          </div>
+        ))}
+
+      </div>
+    </div>
+
+    {/* CONFIRM MODAL (mobile safe) */}
+    {confirm.open && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+
+        <div className="bg-white p-6 rounded-xl w-full max-w-sm shadow-xl">
+
+          <h2 className="text-lg font-bold mb-3">
+            Durumu değiştirmek istiyor musun?
+          </h2>
+
+          <p className="text-sm text-gray-600 mb-4">
+            {confirm.status} olarak güncellenecek
+          </p>
+
+          <select
+            value={confirm.performedBy || ""}
+            onChange={(e) =>
+              setConfirm((prev) => ({
+                ...prev,
+                performedBy: e.target.value,
+              }))
+            }
+            className="w-full p-2 border rounded mb-3 text-sm"
+          >
+            <option value="">Yapan kişiyi seç</option>
+            <option value="berat.dimen@cridea.com.tr">BERAT</option>
+            <option value="sehmus@cridea.com.tr">ŞEHMUS</option>
+            <option value="deniz@cridea.com.tr">DENİZ</option>
+            <option value="safa.dalgicoglu@cridea.com.tr">SAFA</option>
+          </select>
+
+          <div className="flex gap-2 justify-end">
+
+            <button
+              onClick={() => setConfirm({ open: false })}
+              className="px-3 py-1 bg-gray-200 rounded"
+            >
+              İptal
+            </button>
+
+            <button
+              onClick={async () => {
+                const now = new Date().toISOString();
+
+                let updateData = {
+                  status: confirm.status,
+                };
+
+                if (confirm.status === "doing") {
+                  updateData.started_at = now;
+                }
+
+                if (confirm.status === "done") {
+                  updateData.completed_at = now;
+
+                  if (!confirm.performedBy) {
+                    toast.error("Yapan kişi seçilmedi");
+                    return;
+                  }
+
+                  updateData.performed_by = confirm.performedBy;
+                }
+
+                const { error } = await supabase
+                  .from("todos")
+                  .update(updateData)
+                  .eq("id", confirm.id);
+
+                if (error) {
+                  toast.error("Güncellenemedi");
+                  return;
+                }
+
+                toast.success("Durum güncellendi");
+
+                setConfirm({
+                  open: false,
+                  id: null,
+                  status: null,
+                  assignedTo: null,
+                  performedBy: "",
+                });
+              }}
+              className="px-3 py-1 bg-blue-600 text-white rounded"
+            >
+              Onayla
+            </button>
+
+          </div>
 
         </div>
       </div>
+    )}
 
-      {/* CONFIRM MODAL */}
-      {confirm.open && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-xl w-80 shadow-xl">
-
-            <h2 className="text-lg font-bold mb-3">
-              Durumu değiştirmek istiyor musun?
-            </h2>
-
-            <p className="text-sm text-gray-600 mb-4">
-              {confirm.status} olarak güncellenecek
-            </p>
-<select
-  value={confirm.performedBy || ""}
-  onChange={(e) =>
-    setConfirm((prev) => ({
-      ...prev,
-      performedBy: e.target.value,
-    }))
-  }
-  className="w-full p-2 border rounded mb-3 text-sm"
->
-  <option value="">Yapan kişiyi seç</option>
-  <option value="berat.dimen@cridea.com.tr">BERAT</option>
-  <option value="sehmus@cridea.com.tr">ŞEHMUS</option>
-  <option value="deniz@cridea.com.tr">DENİZ</option>
-  <option value="safa.dalgicoglu@cridea.com.tr">SAFA</option>
-</select>
-            <div className="flex gap-2 justify-end">
-
-              <button
-                onClick={() =>
-                  setConfirm({ open: false })
-                }
-                className="px-3 py-1 bg-gray-200 rounded"
-              >
-                İptal
-              </button>
-
- <button
-  onClick={async () => {
-    const now = new Date().toISOString();
-
-    let updateData = {
-      status: confirm.status,
-    };
-
-    if (confirm.status === "doing") {
-      updateData.started_at = now;
-    }
-
-    if (confirm.status === "done") {
-      updateData.completed_at = now;
-
-      // 👇 ARTIK OTOMATİK DEĞİL
-      if (!confirm.performedBy) {
-        toast.error("Yapan kişi seçilmedi");
-        return;
-      }
-
-      updateData.performed_by = confirm.performedBy;
-    }
-
-    const { error } = await supabase
-      .from("todos")
-      .update(updateData)
-      .eq("id", confirm.id);
-
-    if (error) {
-      toast.error("Güncellenemedi");
-      return;
-    }
-
-    toast.success("Durum güncellendi");
-
-    setConfirm({
-      open: false,
-      id: null,
-      status: null,
-      assignedTo: null,
-      performedBy: "",
-    });
-  }}
-  className="px-3 py-1 bg-blue-600 text-white rounded"
->
-  Onayla
-</button>
-            </div>
-
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  </div>
+);
 }
