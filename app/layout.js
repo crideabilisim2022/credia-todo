@@ -11,7 +11,7 @@ export default function RootLayout({ children }) {
         <SidebarWrapper />
 
         {/* MAIN AREA */}
-        <main  className="flex-1 md:ml-64 pt-14 md:pt-0 w-full min-h-screen">
+            <main className="flex-1 min-w-0 md:ml-64 xl:pl-4 md:pl-10 pt-14 md:pt-0">
           {children}
         </main>
 
