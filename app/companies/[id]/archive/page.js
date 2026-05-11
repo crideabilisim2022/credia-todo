@@ -47,7 +47,7 @@ export default function ArchivePage() {
       .select("*")
       .eq("company_id", id)
       .eq("archived", true)
-      .order("updated_at", { ascending: false });
+      .order("created_at", { ascending: false });
 
     setCompany(companyRes.data);
 
@@ -55,7 +55,7 @@ export default function ArchivePage() {
     const groupedData = {};
 
     (productRes.data || []).forEach((item) => {
-      const key = getMonthKey(item.updated_at);
+      const key = getMonthKey(item.created_at);
 
       if (!groupedData[key]) {
         groupedData[key] = [];
